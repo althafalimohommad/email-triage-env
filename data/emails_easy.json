@@ -1,0 +1,369 @@
+{
+  "task_config": {
+    "task_id": "easy",
+    "description": "You are an email triage assistant. For each email, determine if it is SPAM or NOT SPAM. Use the CLASSIFY action. If it's spam, set category='spam'. For legitimate emails, set the most appropriate category (urgent, follow_up, fyi, meeting, approval). Set priority to 1 for spam, or your best estimate (1-5) for others.",
+    "available_actions": [
+      "classify"
+    ],
+    "time_limit": 120,
+    "difficulty": "easy"
+  },
+  "emails": [
+    {
+      "email_id": "email-006-a59a24",
+      "sender": "noreply@verify-now.click",
+      "sender_domain": "verify-now.click",
+      "subject": "Congratulations! You've been selected for a special offer",
+      "body": "Dear valued customer, we noticed unusual activity on your account. Your account will be PERMANENTLY SUSPENDED unless you verify your identity within 12 hours. Click here to verify: http://secure-verify-account.click/login. Note: Failure to verify will result in permanent data loss.",
+      "timestamp": "2026-04-01T04:14:27.743741",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-004-f4961b",
+      "sender": "noreply@verify-now.click",
+      "sender_domain": "verify-now.click",
+      "subject": "Limited time: FREE iPhone 20 — just pay shipping!",
+      "body": "Dear valued customer, we noticed unusual activity on your account. Your account will be PERMANENTLY SUSPENDED unless you verify your identity within 12 hours. Click here to verify: http://secure-verify-account.click/login. Note: Failure to verify will result in permanent data loss.",
+      "timestamp": "2026-04-01T08:14:27.743730",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-018-315787",
+      "sender": "pm@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Meeting: Quarterly Business Review prep",
+      "body": "Hey! Are you free Thursday afternoon for a quick sync? I want to go over the API contract changes before we start implementation next week. 30 minutes should be enough. Let me know what time works for you between 1-5 PM.",
+      "timestamp": "2026-03-31T13:14:27.743806",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "meeting",
+        "priority": 3,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-017-703c85",
+      "sender": "colleague@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Circling back on the API integration timeline",
+      "body": "Hey, just following up on the Q3 roadmap discussion from last week. We need your team's priorities and resource estimates to finalize the plan. Could you send those over by Thursday? The leadership team is expecting the final version by next Monday.",
+      "timestamp": "2026-03-31T16:14:27.743801",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "follow_up",
+        "priority": 3,
+        "expected_action": "flag",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-011-52d33d",
+      "sender": "manager@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "EMERGENCY: Security vulnerability in production — patch ASAP",
+      "body": "The production server went down at 2:47 AM. Our monitoring shows all API endpoints returning 500 errors. Customer-facing services are completely unavailable. We need everyone online ASAP to diagnose and fix this. Current impact: ~50,000 users affected. Please join the incident channel immediately.",
+      "timestamp": "2026-04-01T01:14:27.743770",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "urgent",
+        "priority": 5,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "acknowledge",
+          "investigating",
+          "priority",
+          "immediately",
+          "team",
+          "fix",
+          "update"
+        ]
+      }
+    },
+    {
+      "email_id": "email-001-378891",
+      "sender": "admin@prize-claim.net",
+      "sender_domain": "prize-claim.net",
+      "subject": "YOU WON $1,000,000!!! Claim your prize NOW!!!",
+      "body": "Dear valued customer, we noticed unusual activity on your account. Your account will be PERMANENTLY SUSPENDED unless you verify your identity within 12 hours. Click here to verify: http://secure-verify-account.click/login. Note: Failure to verify will result in permanent data loss.",
+      "timestamp": "2026-03-31T18:14:27.743705",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-000-8ceaed",
+      "sender": "offers@cheap-meds.biz",
+      "sender_domain": "cheap-meds.biz",
+      "subject": "URGENT: Your account will be suspended — verify immediately",
+      "body": "CONGRATULATIONS!!! You have been randomly selected as our GRAND PRIZE WINNER of $1,000,000 USD! To claim your prize, simply click the link below and enter your bank account details for instant transfer. This offer expires in 24 hours! Don't miss out on this once-in-a-lifetime opportunity! Click here: http://totally-legit-prize.xyz/claim",
+      "timestamp": "2026-03-30T19:14:27.743660",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-014-178ffd",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Weekly Engineering Newsletter — Issue #147",
+      "body": "Just FYI — the parking garage on the east side will be closed for renovations starting next month. Temporary parking will be available in Lot C. Shuttle service will run every 15 minutes from 7 AM to 7 PM.",
+      "timestamp": "2026-04-01T00:14:27.743786",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-007-1d3fa5",
+      "sender": "deals@random-shop.xyz",
+      "sender_domain": "random-shop.xyz",
+      "subject": "Make $5,000/day from home with this ONE trick",
+      "body": "🔥 FLASH SALE 🔥 Get designer watches, handbags, and electronics at 95% OFF retail price! We're the #1 rated online store with millions of satisfied customers. Order now and get FREE shipping worldwide! Visit: http://super-cheap-deals.biz/shop",
+      "timestamp": "2026-04-01T01:14:27.743747",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-013-01c360",
+      "sender": "newsletter@techdigest.io",
+      "sender_domain": "techdigest.io",
+      "subject": "New blog post: How we scaled to 10M users",
+      "body": "Just FYI — the parking garage on the east side will be closed for renovations starting next month. Temporary parking will be available in Lot C. Shuttle service will run every 15 minutes from 7 AM to 7 PM.",
+      "timestamp": "2026-04-01T16:14:27.743780",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-015-5a02cc",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "New blog post: How we scaled to 10M users",
+      "body": "This week in engineering: We shipped the new caching layer (latency down 40%), the mobile team hit 99.9% crash-free rate, and we're kicking off the accessibility audit next sprint. Full details in the wiki.",
+      "timestamp": "2026-03-30T21:14:27.743791",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-002-846f91",
+      "sender": "offers@cheap-meds.biz",
+      "sender_domain": "cheap-meds.biz",
+      "subject": "Re: Your order #99281 — action required",
+      "body": "Hi! I am Prince Abubakar from Nigeria. I have $50,000,000 USD that I need help transferring to a foreign account. For your assistance, you will receive 30% ($15,000,000). Please reply with your full name, address, and bank details to proceed. This is 100% legal and risk-free.",
+      "timestamp": "2026-03-31T12:14:27.743717",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-010-14fb10",
+      "sender": "manager@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "CRITICAL BUG: Users losing data on save — fix needed immediately",
+      "body": "Payment processing has been failing intermittently since 6 AM. We've confirmed the issue affects Stripe and PayPal integrations across US, EU, and APAC regions. Revenue impact estimated at $45,000/hour. Engineering and finance teams need to coordinate on this immediately.",
+      "timestamp": "2026-03-31T07:14:27.743764",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "urgent",
+        "priority": 5,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "acknowledge",
+          "investigating",
+          "priority",
+          "immediately",
+          "team",
+          "fix",
+          "update"
+        ]
+      }
+    },
+    {
+      "email_id": "email-012-051280",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Industry report: State of AI in Enterprise 2026",
+      "body": "Hi team, just a heads up that the office will be closed on the following dates for the 2026 holiday season: Dec 24-25, Dec 31-Jan 1. Please plan your projects accordingly. Remote work is available for all other days during the holiday period.",
+      "timestamp": "2026-03-31T19:14:27.743775",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-008-fffd5d",
+      "sender": "winner@lottery-intl.co",
+      "sender_domain": "lottery-intl.co",
+      "subject": "Re: Your order #99281 — action required",
+      "body": "Dear valued customer, we noticed unusual activity on your account. Your account will be PERMANENTLY SUSPENDED unless you verify your identity within 12 hours. Click here to verify: http://secure-verify-account.click/login. Note: Failure to verify will result in permanent data loss.",
+      "timestamp": "2026-03-31T00:14:27.743753",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-019-23a17b",
+      "sender": "pm@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Can we sync for 30 min Thursday afternoon?",
+      "body": "Hey! Are you free Thursday afternoon for a quick sync? I want to go over the API contract changes before we start implementation next week. 30 minutes should be enough. Let me know what time works for you between 1-5 PM.",
+      "timestamp": "2026-04-01T03:14:27.743814",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "meeting",
+        "priority": 3,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-005-95532e",
+      "sender": "winner@lottery-intl.co",
+      "sender_domain": "lottery-intl.co",
+      "subject": "Limited time: FREE iPhone 20 — just pay shipping!",
+      "body": "🔥 FLASH SALE 🔥 Get designer watches, handbags, and electronics at 95% OFF retail price! We're the #1 rated online store with millions of satisfied customers. Order now and get FREE shipping worldwide! Visit: http://super-cheap-deals.biz/shop",
+      "timestamp": "2026-03-31T22:14:27.743736",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-009-5191e3",
+      "sender": "noreply@verify-now.click",
+      "sender_domain": "verify-now.click",
+      "subject": "Re: Your order #99281 — action required",
+      "body": "🔥 FLASH SALE 🔥 Get designer watches, handbags, and electronics at 95% OFF retail price! We're the #1 rated online store with millions of satisfied customers. Order now and get FREE shipping worldwide! Visit: http://super-cheap-deals.biz/shop",
+      "timestamp": "2026-03-31T09:14:27.743758",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-016-188849",
+      "sender": "lead@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "RE: Q3 roadmap — waiting on your input",
+      "body": "Hi, I wanted to circle back on the design review from Tuesday. You had some great suggestions about the navigation flow, but I want to make sure I captured your concerns about the mobile layout correctly. Can you confirm the feedback in the shared doc?",
+      "timestamp": "2026-03-30T17:14:27.743796",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "follow_up",
+        "priority": 3,
+        "expected_action": "flag",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-003-45cf5a",
+      "sender": "admin@prize-claim.net",
+      "sender_domain": "prize-claim.net",
+      "subject": "Make $5,000/day from home with this ONE trick",
+      "body": "Hi! I am Prince Abubakar from Nigeria. I have $50,000,000 USD that I need help transferring to a foreign account. For your assistance, you will receive 30% ($15,000,000). Please reply with your full name, address, and bank details to proceed. This is 100% legal and risk-free.",
+      "timestamp": "2026-04-01T06:14:27.743725",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    }
+  ]
+}

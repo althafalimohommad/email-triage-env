@@ -1,0 +1,25 @@
+spec_version: 1
+name: email_triage_env
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+
+description: >
+  AI Email Triage Environment — a real-world task simulation where an AI agent
+  processes an inbox of emails, classifying them by urgency and category,
+  setting priorities, archiving spam, and drafting replies for important messages.
+
+tasks:
+  - id: easy
+    name: Spam Detection
+    difficulty: easy
+    description: Classify 20 emails as spam or not-spam
+  - id: medium
+    name: Multi-Label Categorization
+    difficulty: medium
+    description: Categorize 30 emails by type and assign priority levels
+  - id: hard
+    name: Full Triage with Response Drafting
+    difficulty: hard
+    description: Classify, prioritize, and draft professional replies for 40 emails

@@ -1,0 +1,595 @@
+{
+  "task_config": {
+    "task_id": "medium",
+    "description": "You are an email triage assistant. For each email:\n1. CLASSIFY it into one of: urgent, follow_up, fyi, spam, meeting, approval\n2. Set PRIORITY (1=lowest, 5=critical)\n3. Optionally FLAG important emails or ARCHIVE spam\nMaximize both classification accuracy and priority accuracy.",
+    "available_actions": [
+      "classify",
+      "flag",
+      "archive"
+    ],
+    "time_limit": 180,
+    "difficulty": "medium"
+  },
+  "emails": [
+    {
+      "email_id": "email-008-6e6e4e",
+      "sender": "sre-alerts@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "CRITICAL BUG: Users losing data on save — fix needed immediately",
+      "body": "A critical RCE vulnerability (CVE-2026-1234) has been published affecting our web framework version. Our production systems are vulnerable. A patch is available but requires testing. We need to deploy to staging within 2 hours and production by end of day.",
+      "timestamp": "2026-04-01T16:14:27.745582",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "urgent",
+        "priority": 5,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "acknowledge",
+          "investigating",
+          "priority",
+          "immediately",
+          "team",
+          "fix",
+          "update"
+        ]
+      }
+    },
+    {
+      "email_id": "email-015-daeb9a",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "FYI: New office holiday schedule for 2026",
+      "body": "The recording from yesterday's company all-hands is now available on the intranet. Key topics covered: Q3 financial results (revenue up 15%), new product roadmap, and the upcoming office expansion. Q&A section starts at the 45-minute mark.",
+      "timestamp": "2026-04-01T10:14:27.745637",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-011-276631",
+      "sender": "vendor@partnerco.com",
+      "sender_domain": "partnerco.com",
+      "subject": "RE: Q3 roadmap — waiting on your input",
+      "body": "Following up on our conversation about the database migration plan. The DBA team has approved the schema changes, but we still need your sign-off on the rollback strategy before we can schedule the maintenance window.",
+      "timestamp": "2026-03-31T13:14:27.745616",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "follow_up",
+        "priority": 3,
+        "expected_action": "flag",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-005-6cb37b",
+      "sender": "vp-engineering@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "CRITICAL BUG: Users losing data on save — fix needed immediately",
+      "body": "The production server went down at 2:47 AM. Our monitoring shows all API endpoints returning 500 errors. Customer-facing services are completely unavailable. We need everyone online ASAP to diagnose and fix this. Current impact: ~50,000 users affected. Please join the incident channel immediately.",
+      "timestamp": "2026-03-31T21:14:27.745504",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "urgent",
+        "priority": 5,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "acknowledge",
+          "investigating",
+          "priority",
+          "immediately",
+          "team",
+          "fix",
+          "update"
+        ]
+      }
+    },
+    {
+      "email_id": "email-003-0efe72",
+      "sender": "winner@lottery-intl.co",
+      "sender_domain": "lottery-intl.co",
+      "subject": "Make $5,000/day from home with this ONE trick",
+      "body": "Dear valued customer, we noticed unusual activity on your account. Your account will be PERMANENTLY SUSPENDED unless you verify your identity within 12 hours. Click here to verify: http://secure-verify-account.click/login. Note: Failure to verify will result in permanent data loss.",
+      "timestamp": "2026-03-31T01:14:27.745474",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-019-ee61c3",
+      "sender": "comms@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "New blog post: How we scaled to 10M users",
+      "body": "Hi team, just a heads up that the office will be closed on the following dates for the 2026 holiday season: Dec 24-25, Dec 31-Jan 1. Please plan your projects accordingly. Remote work is available for all other days during the holiday period.",
+      "timestamp": "2026-04-01T02:14:27.745657",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-026-dd6f8e",
+      "sender": "legal@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Software License: Renewal $8,500/yr — Finance approval needed",
+      "body": "I'd like to request PTO from December 23-27 (3 working days + 2 holidays). My projects are on track and I've arranged coverage with Sarah for any urgent issues. Please approve at your earliest convenience so I can book flights.",
+      "timestamp": "2026-03-31T08:14:27.745692",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "approval",
+        "priority": 4,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "approved",
+          "review",
+          "confirmed",
+          "processed",
+          "authorize"
+        ]
+      }
+    },
+    {
+      "email_id": "email-002-cd93b2",
+      "sender": "winner@lottery-intl.co",
+      "sender_domain": "lottery-intl.co",
+      "subject": "🔥 EXCLUSIVE DEAL: 95% OFF designer watches — TODAY ONLY",
+      "body": "Dear valued customer, we noticed unusual activity on your account. Your account will be PERMANENTLY SUSPENDED unless you verify your identity within 12 hours. Click here to verify: http://secure-verify-account.click/login. Note: Failure to verify will result in permanent data loss.",
+      "timestamp": "2026-03-31T16:14:27.745459",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-007-52df96",
+      "sender": "manager@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "🚨 URGENT: Production server down — all hands needed",
+      "body": "A critical RCE vulnerability (CVE-2026-1234) has been published affecting our web framework version. Our production systems are vulnerable. A patch is available but requires testing. We need to deploy to staging within 2 hours and production by end of day.",
+      "timestamp": "2026-03-31T01:14:27.745535",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "urgent",
+        "priority": 5,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "acknowledge",
+          "investigating",
+          "priority",
+          "immediately",
+          "team",
+          "fix",
+          "update"
+        ]
+      }
+    },
+    {
+      "email_id": "email-010-12ff39",
+      "sender": "vendor@partnerco.com",
+      "sender_domain": "partnerco.com",
+      "subject": "Circling back on the API integration timeline",
+      "body": "Hi, I wanted to circle back on the design review from Tuesday. You had some great suggestions about the navigation flow, but I want to make sure I captured your concerns about the mobile layout correctly. Can you confirm the feedback in the shared doc?",
+      "timestamp": "2026-04-01T04:14:27.745610",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "follow_up",
+        "priority": 3,
+        "expected_action": "flag",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-006-810624",
+      "sender": "ceo@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "CRITICAL: Customer data breach detected — immediate action required",
+      "body": "Our biggest client (30% of revenue) just emailed saying they're evaluating competitors and want a meeting TODAY to discuss unresolved issues. We need sales, engineering, and product leads in a room by 2 PM to prepare our response and retention strategy.",
+      "timestamp": "2026-03-30T21:14:27.745518",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "urgent",
+        "priority": 5,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "acknowledge",
+          "investigating",
+          "priority",
+          "immediately",
+          "team",
+          "fix",
+          "update"
+        ]
+      }
+    },
+    {
+      "email_id": "email-009-c5b34d",
+      "sender": "vp-engineering@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "EMERGENCY: Security vulnerability in production — patch ASAP",
+      "body": "Payment processing has been failing intermittently since 6 AM. We've confirmed the issue affects Stripe and PayPal integrations across US, EU, and APAC regions. Revenue impact estimated at $45,000/hour. Engineering and finance teams need to coordinate on this immediately.",
+      "timestamp": "2026-04-01T04:14:27.745602",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "urgent",
+        "priority": 5,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "acknowledge",
+          "investigating",
+          "priority",
+          "immediately",
+          "team",
+          "fix",
+          "update"
+        ]
+      }
+    },
+    {
+      "email_id": "email-022-f25222",
+      "sender": "pm@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Interview panel: Frontend candidate at 2 PM",
+      "body": "Our 1:1 has been rescheduled from Monday to Wednesday at 3 PM due to the client demo conflict. Same Zoom link. I'd like to discuss your career development goals and the tech lead opportunity that opened up.",
+      "timestamp": "2026-03-31T10:14:27.745672",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "meeting",
+        "priority": 3,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-017-1f2e97",
+      "sender": "comms@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "FYI: Kitchen renovation — use 3rd floor break room",
+      "body": "This week in engineering: We shipped the new caching layer (latency down 40%), the mobile team hit 99.9% crash-free rate, and we're kicking off the accessibility audit next sprint. Full details in the wiki.",
+      "timestamp": "2026-04-01T04:14:27.745647",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-001-3c26fb",
+      "sender": "noreply@verify-now.click",
+      "sender_domain": "verify-now.click",
+      "subject": "Congratulations! You've been selected for a special offer",
+      "body": "CONGRATULATIONS!!! You have been randomly selected as our GRAND PRIZE WINNER of $1,000,000 USD! To claim your prize, simply click the link below and enter your bank account details for instant transfer. This offer expires in 24 hours! Don't miss out on this once-in-a-lifetime opportunity! Click here: http://totally-legit-prize.xyz/claim",
+      "timestamp": "2026-03-30T17:14:27.745432",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-021-dc7de9",
+      "sender": "teammate@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Meeting: Quarterly Business Review prep",
+      "body": "Our 1:1 has been rescheduled from Monday to Wednesday at 3 PM due to the client demo conflict. Same Zoom link. I'd like to discuss your career development goals and the tech lead opportunity that opened up.",
+      "timestamp": "2026-04-01T09:14:27.745668",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "meeting",
+        "priority": 3,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-029-6cdf8e",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Contract Amendment: Partner Co. — Legal review needed",
+      "body": "I'd like to request PTO from December 23-27 (3 working days + 2 holidays). My projects are on track and I've arranged coverage with Sarah for any urgent issues. Please approve at your earliest convenience so I can book flights.",
+      "timestamp": "2026-04-01T02:14:27.745709",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "approval",
+        "priority": 4,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "approved",
+          "review",
+          "confirmed",
+          "processed",
+          "authorize"
+        ]
+      }
+    },
+    {
+      "email_id": "email-018-f88747",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "New blog post: How we scaled to 10M users",
+      "body": "The recording from yesterday's company all-hands is now available on the intranet. Key topics covered: Q3 financial results (revenue up 15%), new product roadmap, and the upcoming office expansion. Q&A section starts at the 45-minute mark.",
+      "timestamp": "2026-03-30T21:14:27.745652",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-028-e588d2",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Contract Amendment: Partner Co. — Legal review needed",
+      "body": "The annual license renewal for our monitoring platform is due January 1. Cost: $8,500/year (same as last year). We evaluated alternatives but this remains the best option for our needs. Finance approval required to process payment. Detailed comparison report attached.",
+      "timestamp": "2026-03-31T15:14:27.745703",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "approval",
+        "priority": 4,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "approved",
+          "review",
+          "confirmed",
+          "processed",
+          "authorize"
+        ]
+      }
+    },
+    {
+      "email_id": "email-012-971168",
+      "sender": "vendor@partnerco.com",
+      "sender_domain": "partnerco.com",
+      "subject": "Following up on our conversation about the migration plan",
+      "body": "Hi, I wanted to circle back on the design review from Tuesday. You had some great suggestions about the navigation flow, but I want to make sure I captured your concerns about the mobile layout correctly. Can you confirm the feedback in the shared doc?",
+      "timestamp": "2026-04-01T01:14:27.745622",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "follow_up",
+        "priority": 3,
+        "expected_action": "flag",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-024-4530a1",
+      "sender": "calendar@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Interview panel: Frontend candidate at 2 PM",
+      "body": "Our 1:1 has been rescheduled from Monday to Wednesday at 3 PM due to the client demo conflict. Same Zoom link. I'd like to discuss your career development goals and the tech lead opportunity that opened up.",
+      "timestamp": "2026-04-01T13:14:27.745682",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "meeting",
+        "priority": 3,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-025-674a4d",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Access Request: Production database — Security approval required",
+      "body": "We need to order 10 new MacBook Pro laptops for the incoming engineering hires starting January 15. Total cost: $15,000. Vendor: Apple Business. Delivery: 5-7 business days. Budget code: ENG-2026-Q1. Please approve so we can place the order this week.",
+      "timestamp": "2026-03-31T17:14:27.745687",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "approval",
+        "priority": 4,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "approved",
+          "review",
+          "confirmed",
+          "processed",
+          "authorize"
+        ]
+      }
+    },
+    {
+      "email_id": "email-014-e1688e",
+      "sender": "vendor@partnerco.com",
+      "sender_domain": "partnerco.com",
+      "subject": "RE: Could you review the attached document?",
+      "body": "Quick reminder that the project proposal for the new microservices architecture is due this Friday. I know you wanted to include the cost analysis — do you have the numbers from the cloud team yet? Happy to help if you need anything.",
+      "timestamp": "2026-03-31T21:14:27.745631",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "follow_up",
+        "priority": 3,
+        "expected_action": "flag",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-004-923c20",
+      "sender": "admin@prize-claim.net",
+      "sender_domain": "prize-claim.net",
+      "subject": "You have (1) new message from a beautiful woman near you",
+      "body": "Hi! I am Prince Abubakar from Nigeria. I have $50,000,000 USD that I need help transferring to a foreign account. For your assistance, you will receive 30% ($15,000,000). Please reply with your full name, address, and bank details to proceed. This is 100% legal and risk-free.",
+      "timestamp": "2026-04-01T11:14:27.745488",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-020-caf90f",
+      "sender": "recruiter@hiringco.com",
+      "sender_domain": "hiringco.com",
+      "subject": "Standup reminder — daily at 9:15 AM",
+      "body": "Reminder: Team retrospective is this Friday at 2 PM. Please add your thoughts to the retro board before the meeting: What went well? What could be improved? Action items from last retro. Link to board: retro.acmecorp.com/sprint-47",
+      "timestamp": "2026-03-31T12:14:27.745662",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "meeting",
+        "priority": 3,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-027-f4bd6f",
+      "sender": "hr@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Expense Report #4521 — $2,340 — Needs Your Approval",
+      "body": "The annual license renewal for our monitoring platform is due January 1. Cost: $8,500/year (same as last year). We evaluated alternatives but this remains the best option for our needs. Finance approval required to process payment. Detailed comparison report attached.",
+      "timestamp": "2026-03-31T09:14:27.745697",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "approval",
+        "priority": 4,
+        "expected_action": "reply",
+        "needs_reply": true,
+        "response_keywords": [
+          "approved",
+          "review",
+          "confirmed",
+          "processed",
+          "authorize"
+        ]
+      }
+    },
+    {
+      "email_id": "email-013-ed49a9",
+      "sender": "lead@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "RE: Budget allocation — need your sign-off",
+      "body": "Hey, just following up on the Q3 roadmap discussion from last week. We need your team's priorities and resource estimates to finalize the plan. Could you send those over by Thursday? The leadership team is expecting the final version by next Monday.",
+      "timestamp": "2026-04-01T11:14:27.745627",
+      "has_attachments": false,
+      "reply_to": null,
+      "labels": {
+        "category": "follow_up",
+        "priority": 3,
+        "expected_action": "flag",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-000-fe3e0c",
+      "sender": "admin@prize-claim.net",
+      "sender_domain": "prize-claim.net",
+      "subject": "🔥 EXCLUSIVE DEAL: 95% OFF designer watches — TODAY ONLY",
+      "body": "Dear valued customer, we noticed unusual activity on your account. Your account will be PERMANENTLY SUSPENDED unless you verify your identity within 12 hours. Click here to verify: http://secure-verify-account.click/login. Note: Failure to verify will result in permanent data loss.",
+      "timestamp": "2026-03-30T21:14:27.745379",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "spam",
+        "priority": 1,
+        "expected_action": "archive",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-023-1f431b",
+      "sender": "calendar@acmecorp.com",
+      "sender_domain": "acmecorp.com",
+      "subject": "Meeting Invite: Sprint Planning (Tomorrow 10 AM)",
+      "body": "Our 1:1 has been rescheduled from Monday to Wednesday at 3 PM due to the client demo conflict. Same Zoom link. I'd like to discuss your career development goals and the tech lead opportunity that opened up.",
+      "timestamp": "2026-03-31T09:14:27.745677",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "meeting",
+        "priority": 3,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    },
+    {
+      "email_id": "email-016-818261",
+      "sender": "updates@industry-news.com",
+      "sender_domain": "industry-news.com",
+      "subject": "FYI: New office holiday schedule for 2026",
+      "body": "Hi team, just a heads up that the office will be closed on the following dates for the 2026 holiday season: Dec 24-25, Dec 31-Jan 1. Please plan your projects accordingly. Remote work is available for all other days during the holiday period.",
+      "timestamp": "2026-04-01T03:14:27.745642",
+      "has_attachments": true,
+      "reply_to": null,
+      "labels": {
+        "category": "fyi",
+        "priority": 2,
+        "expected_action": "classify",
+        "needs_reply": false,
+        "response_keywords": []
+      }
+    }
+  ]
+}
