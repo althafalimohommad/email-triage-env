@@ -11,7 +11,7 @@ tags:
   - email-triage
   - reinforcement-learning
   - agent
-short_description: OpenEnv environment for AI email triage — classify, prioritize, and draft replies
+short_description: OpenEnv AI email triage agent environment
 ---
 
 # 📧 Email Triage Environment
