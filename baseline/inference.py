@@ -32,7 +32,7 @@ from openai import OpenAI
 # ── Configuration ────────────────────────────────────────────────────────────
 
 DEFAULT_ENV_URL = "http://localhost:8000"
-DEFAULT_MODEL = "gpt-4"
+DEFAULT_MODEL = "gpt-4o-mini"
 
 SYSTEM_PROMPT = """You are an expert email triage assistant. You process emails from a busy professional inbox.
 
@@ -90,15 +90,38 @@ def run_agent_step(client: OpenAI, model: str, observation: dict) -> dict:
     user_msg = create_agent_prompt(observation)
 
     try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_msg},
-            ],
-            temperature=0.0,  # Deterministic for reproducibility
-            response_format={"type": "json_object"},
-        )
+        # Try chat completions first, fall back to responses API
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_msg},
+                ],
+                temperature=0.0,  # Deterministic for reproducibility
+            )
+        except Exception as chat_err:
+            # Fallback for models that only support responses API
+            print(f"  ⚠ Chat API failed ({chat_err}), trying responses API...")
+            response = client.responses.create(
+                model=model,
+                input=SYSTEM_PROMPT + "\n\n" + user_msg,
+            )
+            content = response.output_text
+            # Try to extract JSON from the response
+            import re
+            json_match = re.search(r'\{[^{}]*\}', content, re.DOTALL)
+            if json_match:
+                action = json.loads(json_match.group())
+            else:
+                action = json.loads(content)
+            if "action_type" not in action:
+                action["action_type"] = "classify"
+            if "category" not in action:
+                action["category"] = "fyi"
+            if "priority" not in action:
+                action["priority"] = 3
+            return action
 
         content = response.choices[0].message.content
         action = json.loads(content)
@@ -139,9 +162,12 @@ def run_task(
     print(f"  TASK: {task_id.upper()}")
     print(f"{'='*60}")
 
-    # Reset environment
-    resp = requests.post(f"{env_url}/reset", timeout=30)
-    if resp.status_code != 200:
+    # Reset environment with the specific task
+    resp = requests.post(f"{env_url}/reset", params={"task_id": task_id}, timeout=30)
+    if resp.status_code == 405:
+        # Fallback: try the standard reset with task_id in body
+        resp = requests.post(f"{env_url}/reset_task", params={"task_id": task_id}, timeout=30)
+    if resp.status_code not in (200, 201):
         print(f"  ❌ Reset failed: {resp.status_code} — {resp.text}")
         return 0.0, []
 
@@ -162,12 +188,24 @@ def run_task(
             f"Priority: {action.get('priority', '?')}"
         )
 
-        # Send action to environment
+        # Send action to environment — wrap in proper format
+        # Ensure priority is an integer
+        if "priority" in action and action["priority"] is not None:
+            action["priority"] = int(action["priority"])
+
         step_resp = requests.post(
             f"{env_url}/step",
-            json=action,
+            json={"action": action},
             timeout=30,
         )
+
+        # If wrapping didn't work, try sending raw
+        if step_resp.status_code == 422:
+            step_resp = requests.post(
+                f"{env_url}/step",
+                json=action,
+                timeout=30,
+            )
 
         if step_resp.status_code != 200:
             print(f"  ❌ Step failed: {step_resp.status_code} — {step_resp.text}")
@@ -206,6 +244,12 @@ def run_task(
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
+# Provider presets for easy switching
+PROVIDERS = {
+    "openai": {"base_url": None, "default_model": "gpt-4o-mini"},
+    "groq": {"base_url": "https://api.groq.com/openai/v1", "default_model": "llama-3.3-70b-versatile"},
+}
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -218,8 +262,8 @@ def main():
     )
     parser.add_argument(
         "--model",
-        default=os.environ.get("OPENAI_MODEL", DEFAULT_MODEL),
-        help="OpenAI model to use",
+        default=None,
+        help="Model to use (default depends on provider)",
     )
     parser.add_argument(
         "--tasks",
@@ -227,22 +271,41 @@ def main():
         default=["easy", "medium", "hard"],
         help="Tasks to run (default: all three)",
     )
+    parser.add_argument(
+        "--provider",
+        default="openai",
+        choices=list(PROVIDERS.keys()),
+        help="LLM provider: openai or groq (default: openai)",
+    )
     args = parser.parse_args()
+
+    # Get provider config
+    provider = PROVIDERS[args.provider]
+    model = args.model or os.environ.get("OPENAI_MODEL") or provider["default_model"]
+    base_url = os.environ.get("OPENAI_BASE_URL") or provider["base_url"]
 
     # Validate API key
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         print("❌ Error: OPENAI_API_KEY environment variable not set!")
-        print("   Set it with: $env:OPENAI_API_KEY = 'your-key-here'")
+        print()
+        print("   For OpenAI:  $env:OPENAI_API_KEY = 'sk-...'")
+        print("   For Groq:    $env:OPENAI_API_KEY = 'gsk_...'")
+        print()
+        print("   Then run:    python baseline/inference.py --provider groq")
         sys.exit(1)
 
-    # Initialize OpenAI client
-    client = OpenAI(api_key=api_key)
+    # Initialize client (works with OpenAI, Groq, Together, etc.)
+    client_kwargs = {"api_key": api_key}
+    if base_url:
+        client_kwargs["base_url"] = base_url
+    client = OpenAI(**client_kwargs)
 
     print("╔════════════════════════════════════════════════════════════╗")
     print("║     Email Triage Environment — Baseline Inference         ║")
     print("╠════════════════════════════════════════════════════════════╣")
-    print(f"║  Model:    {args.model:47s}║")
+    print(f"║  Provider: {args.provider:47s}║")
+    print(f"║  Model:    {model:47s}║")
     print(f"║  Env URL:  {args.env_url:47s}║")
     print(f"║  Tasks:    {', '.join(args.tasks):47s}║")
     print("╚════════════════════════════════════════════════════════════╝")
@@ -251,7 +314,7 @@ def main():
     start_time = time.time()
 
     for task_id in args.tasks:
-        score, results = run_task(args.env_url, client, args.model, task_id)
+        score, results = run_task(args.env_url, client, model, task_id)
         all_scores[task_id] = score
 
     elapsed = time.time() - start_time

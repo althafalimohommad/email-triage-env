@@ -4,6 +4,8 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+from typing import Optional
+
 """
 FastAPI application for the Email Triage Environment.
 
@@ -53,6 +55,84 @@ app = create_app(
 
 
 # ── Custom endpoints ─────────────────────────────────────────────────────────
+
+@app.post("/reset")
+async def reset_env(task_id: Optional[str] = "easy"):
+    """
+    Reset the environment with a specific task.
+
+    Query params:
+        task_id: One of 'easy', 'medium', 'hard' (default: 'easy')
+
+    This overrides the default /reset to allow per-task selection.
+    """
+    valid_tasks = {"easy", "medium", "hard"}
+    if task_id not in valid_tasks:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid task_id '{task_id}'. Must be one of: {sorted(valid_tasks)}",
+        )
+    env = EmailTriageEnvironment()
+    obs = env.reset_task(task_id)
+    # Store env reference for subsequent /step calls is handled by the framework.
+    # This endpoint is mainly for clients that bypass the standard session model.
+    return obs.model_dump()
+
+
+@app.post("/reset_task")
+async def reset_task(task_id: str = "easy"):
+    """Alias for /reset with task_id body parameter."""
+    valid_tasks = {"easy", "medium", "hard"}
+    if task_id not in valid_tasks:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid task_id '{task_id}'. Must be one of: {sorted(valid_tasks)}",
+        )
+    env = EmailTriageEnvironment()
+    obs = env.reset_task(task_id)
+    return obs.model_dump()
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint used by Docker HEALTHCHECK."""
+    return {"status": "ok", "service": "email_triage_env"}
+
+@app.get("/")
+async def root():
+    """Welcome page with API overview."""
+    return {
+        "name": "Email Triage Environment",
+        "version": "1.0.0",
+        "status": "running ✅",
+        "description": (
+            "A real-world OpenEnv environment where an AI agent processes "
+            "an inbox of emails — classifying, prioritizing, flagging, "
+            "archiving, and drafting replies."
+        ),
+        "endpoints": {
+            "OpenEnv Standard": {
+                "POST /reset": "Reset the environment (start a new episode)",
+                "POST /step": "Execute an action on the current email",
+                "GET /state": "Get current environment state",
+                "GET /schema": "Get action/observation JSON schemas",
+                "WS /ws": "WebSocket endpoint for persistent sessions",
+            },
+            "Custom": {
+                "GET /tasks": "List all available tasks (easy/medium/hard)",
+                "GET /health": "Health check",
+                "GET /docs": "Interactive Swagger API documentation",
+            },
+        },
+        "tasks": ["easy (Spam Detection)", "medium (Multi-Label)", "hard (Full Triage + Reply)"],
+        "quick_start": (
+            "1. POST /reset to start → 2. Read the email in the observation → "
+            "3. POST /step with your action → 4. Repeat until done=true"
+        ),
+    }
+
 
 @app.get("/tasks")
 async def list_tasks():

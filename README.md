@@ -4,7 +4,7 @@
 
 [![OpenEnv](https://img.shields.io/badge/OpenEnv-Compatible-blue)](https://github.com/meta-pytorch/OpenEnv)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-green.svg)](https://www.python.org/)
-[![License: BSD](https://img.shields.io/badge/License-BSD-yellow.svg)](LICENSE)
+[![License: BSD](https://img.shields.io/badge/License-BSD--3--Clause-yellow.svg)](LICENSE)
 
 ---
 
@@ -114,7 +114,7 @@ Rewards provide **partial credit** throughout the episode (not just binary end s
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/email_triage_env.git
+git clone https://github.com/YOUR_GITHUB_USERNAME/email_triage_env.git
 cd email_triage_env
 
 # Install dependencies
@@ -185,6 +185,38 @@ docker run -p 8000:8000 email-triage-env
 | Hard (Full Triage) | GPT-4 | ~0.58 |
 
 *Scores are approximate and may vary slightly between runs.*
+
+---
+
+## 🚀 Deploying to Hugging Face Spaces
+
+This environment can be deployed as a containerized Hugging Face Space (required for submission).
+
+### Option A — Using the OpenEnv CLI (recommended)
+```bash
+# Install the CLI
+pip install openenv-core
+
+# Login to HF
+huggingface-cli login
+
+# Push to your HF account (tags the space with 'openenv' automatically)
+openenv push --repo-id YOUR_HF_USERNAME/email-triage-env
+```
+
+### Option B — Manual Docker Build
+```bash
+# Build locally
+docker build -f server/Dockerfile -t email-triage-env .
+
+# Test locally before pushing
+docker run -p 8000:8000 email-triage-env
+
+# Then create a Space at huggingface.co/new-space (type: Docker)
+# and push with git
+```
+
+> **Tag your HF Space** with `openenv` so it appears in the hackathon's leaderboard.
 
 ---
 
