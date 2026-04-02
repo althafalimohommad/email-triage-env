@@ -130,8 +130,8 @@ Rewards provide **partial credit** throughout the episode (not just binary end s
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_GITHUB_USERNAME/email_triage_env.git
-cd email_triage_env
+git clone https://github.com/althafalimohommad/email-triage-env.git
+cd email-triage-env
 
 # Install dependencies
 pip install -e .
@@ -147,18 +147,23 @@ uvicorn server.app:app --host 0.0.0.0 --port 8000
 python -m server.app
 ```
 
-### Running the Baseline
+### Running the Inference Script
 
 ```bash
-# Set your API key
-export OPENAI_API_KEY="your-key-here"   # Linux/Mac
-$env:OPENAI_API_KEY = "your-key-here"   # Windows PowerShell
+# Set required env variables
+export HF_TOKEN="hf_xxx"                 # Linux/Mac
+$env:HF_TOKEN = "hf_xxx"                 # Windows PowerShell
 
-# Run baseline inference
-python baseline/inference.py
+# Run against local server
+python inference.py
 
-# Specify model
-python baseline/inference.py --model gpt-4
+# Run against deployed HF Space
+$env:ENV_URL = "https://althafali-email-triage-env.hf.space"
+python inference.py
+
+# Use a custom model
+$env:MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct"
+python inference.py
 ```
 
 ### Using the Client
