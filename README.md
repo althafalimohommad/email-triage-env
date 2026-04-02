@@ -1,3 +1,19 @@
+---
+title: Email Triage Env
+emoji: 📧
+colorFrom: blue
+colorTo: purple
+sdk: docker
+pinned: false
+license: bsd-3-clause
+tags:
+  - openenv
+  - email-triage
+  - reinforcement-learning
+  - agent
+short_description: OpenEnv environment for AI email triage — classify, prioritize, and draft replies
+---
+
 # 📧 Email Triage Environment
 
 > An OpenEnv environment simulating real-world email triage — where an AI agent processes an inbox, classifying emails by urgency, setting priorities, archiving spam, and drafting professional replies.
