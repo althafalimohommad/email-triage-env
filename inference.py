@@ -35,11 +35,11 @@ import requests
 from openai import OpenAI
 
 # ── Environment variables (validator-injected + defaults where allowed) ────────
-# API_BASE_URL: validator injects the LiteLLM proxy URL; default is your active URL
-API_BASE_URL     = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
-# MODEL_NAME: validator may override; default to your active model
+# API_BASE_URL: validator MUST inject this — REQUIRED, no default
+API_BASE_URL     = os.getenv("API_BASE_URL")
+# MODEL_NAME: validator may override; reasonable default for local testing
 MODEL_NAME       = os.getenv("MODEL_NAME",   "meta-llama/Llama-3.3-70B-Instruct")
-# HF_TOKEN: NO default — must be set externally
+# HF_TOKEN: Optional — only needed if using HF endpoints
 HF_TOKEN         = os.getenv("HF_TOKEN")
 # LOCAL_IMAGE_NAME: optional — only needed when using from_docker_image()
 LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
@@ -232,16 +232,46 @@ def main() -> None:
 
     if not api_key:
         print(
-            "[ERROR] API_KEY environment variable is not set. "
-            "This must be injected by the hackathon validator.",
+            "[ERROR] API_KEY environment variable is not set.",
+            flush=True,
+        )
+        print(
+            "[INFO] For local testing, follow these steps:",
+            flush=True,
+        )
+        print(
+            "[INFO]   1. cp .env.example .env",
+            flush=True,
+        )
+        print(
+            "[INFO]   2. Edit .env and add your API credentials:",
+            flush=True,
+        )
+        print(
+            "[INFO]      - API_BASE_URL=<your-proxy-url>",
+            flush=True,
+        )
+        print(
+            "[INFO]      - API_KEY=<your-api-key>",
+            flush=True,
+        )
+        print(
+            "[INFO]   3. Run: ./run.bat (Windows) or ./run.sh (Linux/Mac)",
+            flush=True,
+        )
+        print(
+            "[INFO] At hackathon submission, the validator will inject these automatically.",
             flush=True,
         )
         sys.exit(1)
 
     if not API_BASE_URL:
         print(
-            "[ERROR] API_BASE_URL environment variable is not set. "
-            "This must be injected by the hackathon validator.",
+            "[ERROR] API_BASE_URL environment variable is not set.",
+            flush=True,
+        )
+        print(
+            "[INFO] Please set API_BASE_URL in your .env file or environment.",
             flush=True,
         )
         sys.exit(1)
