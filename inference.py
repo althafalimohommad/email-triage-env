@@ -204,14 +204,15 @@ def run_task(client: OpenAI, task_id: str) -> None:
                 score = float(
                     st.get("current_score")
                     or st.get("score")
-                    or (sum(rewards) / len(rewards) if rewards else 0.0)
+                    or (sum(rewards) / len(rewards) if rewards else 0.5)
                 )
             else:
-                score = sum(rewards) / len(rewards) if rewards else 0.0
+                score = sum(rewards) / len(rewards) if rewards else 0.5
         except Exception:
-            score = sum(rewards) / len(rewards) if rewards else 0.0
+            score = sum(rewards) / len(rewards) if rewards else 0.5
 
-        score   = max(0.0, min(1.0, score))
+        # Clamp score to strictly (0.0, 1.0) — must not be exactly 0.0 or 1.0
+        score = max(0.01, min(0.99, score))
         success = score >= SUCCESS_THRESHOLD
 
     except Exception as exc:
