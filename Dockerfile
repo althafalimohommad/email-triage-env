@@ -1,17 +1,17 @@
 # Email Triage Environment — Hugging Face Space Dockerfile
 # HF Spaces requires Dockerfile at the repo root.
-# Use Python 3.11 base image (more universally cached than -slim variants)
+# Use Python 3.11-alpine - minimal image most likely to be cached universally
 
-FROM python:3.11
+FROM python:3.11-alpine
 
 WORKDIR /app
 
-# Install system dependencies with retry for network resilience
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+# Install system dependencies (alpine uses apk instead of apt-get)
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    linux-headers && \
+    apk add --no-cache --virtual .build-deps build-base
 
 # Upgrade pip first to avoid resolver issues
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
@@ -21,8 +21,10 @@ COPY pyproject.toml README.md LICENSE ./
 COPY . .
 
 # Install Python dependencies
-# Use --no-deps for some packages to avoid version conflicts if any
 RUN pip install --no-cache-dir -e .
+
+# Clean up build dependencies
+RUN apk del .build-deps
 
 # Expose HF Spaces default port
 EXPOSE 7860
