@@ -34,13 +34,17 @@ from typing import List, Optional
 import requests
 from openai import OpenAI
 
-# ── Mandatory env variables — injected by the hackathon validator ─────────────
-# These MUST be read from environment variables. Do NOT add fallbacks to
-# personal credentials or hardcode alternative base URLs.
-API_BASE_URL = os.environ.get("API_BASE_URL")   # e.g. https://litellm-proxy.../v1
-API_KEY      = os.environ.get("API_KEY")         # LiteLLM proxy key
-MODEL_NAME   = os.getenv("MODEL_NAME", "meta-llama/Llama-3.3-70B-Instruct")
-ENV_URL      = os.getenv("ENV_URL", "http://localhost:8000").rstrip("/")
+# ── Environment variables (validator-injected + defaults where allowed) ────────
+# API_BASE_URL: validator injects the LiteLLM proxy URL; default is your active URL
+API_BASE_URL     = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
+# MODEL_NAME: validator may override; default to your active model
+MODEL_NAME       = os.getenv("MODEL_NAME",   "meta-llama/Llama-3.3-70B-Instruct")
+# HF_TOKEN: NO default — must be set externally
+HF_TOKEN         = os.getenv("HF_TOKEN")
+# LOCAL_IMAGE_NAME: optional — only needed when using from_docker_image()
+LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
+# ENV_URL: the running OpenEnv environment server
+ENV_URL          = os.getenv("ENV_URL", "http://localhost:8000").rstrip("/")
 
 BENCHMARK       = "email_triage_env"
 TASKS           = ["easy", "medium", "hard"]
@@ -223,7 +227,17 @@ def run_task(client: OpenAI, task_id: str) -> None:
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main() -> None:
-    # Validate that the validator-injected env vars are present
+    # API_KEY is injected by the hackathon validator at runtime (LiteLLM proxy key)
+    api_key = os.environ.get("API_KEY")
+
+    if not api_key:
+        print(
+            "[ERROR] API_KEY environment variable is not set. "
+            "This must be injected by the hackathon validator.",
+            flush=True,
+        )
+        sys.exit(1)
+
     if not API_BASE_URL:
         print(
             "[ERROR] API_BASE_URL environment variable is not set. "
@@ -232,15 +246,8 @@ def main() -> None:
         )
         sys.exit(1)
 
-    if not API_KEY:
-        print(
-            "[ERROR] API_KEY environment variable is not set. "
-            "This must be injected by the hackathon validator.",
-            flush=True,
-        )
-        sys.exit(1)
-
     # Initialize the OpenAI-compatible client pointing at the LiteLLM proxy
+    # base_url and api_key MUST come from environment variables (hackathon requirement)
     client = OpenAI(
         base_url=os.environ["API_BASE_URL"],
         api_key=os.environ["API_KEY"],
@@ -249,6 +256,7 @@ def main() -> None:
     print(f"[INFO] ENV_URL={ENV_URL}", flush=True)
     print(f"[INFO] API_BASE_URL={API_BASE_URL}", flush=True)
     print(f"[INFO] MODEL_NAME={MODEL_NAME}", flush=True)
+    print(f"[INFO] HF_TOKEN={'set' if HF_TOKEN else 'not set'}", flush=True)
     print(f"[INFO] Running tasks: {TASKS}", flush=True)
     print("", flush=True)
 
