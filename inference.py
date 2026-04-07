@@ -6,6 +6,7 @@ MANDATORY env variables (injected by the hackathon validator):
     API_KEY         The proxy API key          (REQUIRED — injected by validator)
     MODEL_NAME      The model identifier (default: meta-llama/Llama-3.3-70B-Instruct)
     ENV_URL         Email Triage environment base URL (default: localhost:8000)
+    LOCAL_IMAGE_NAME Optional: Docker image name for async SDK mode
 
 STDOUT FORMAT (strictly enforced):
     [START] task=<task_name> env=<benchmark> model=<model_name>
@@ -16,14 +17,18 @@ NOTE: API_BASE_URL and API_KEY MUST come from environment variables.
       Do NOT hardcode keys or use alternative providers.
 
 Usage:
-    # Against local server:
+    # Against local server (HTTP REST mode):
     uvicorn server.app:app --host 0.0.0.0 --port 8000 &
     API_BASE_URL=<proxy_url> API_KEY=<proxy_key> python inference.py
 
-    # Against deployed HF Space (hackathon):
+    # Against deployed HF Space (HTTP REST mode):
     ENV_URL=https://althafali-email-triage-env.hf.space python inference.py
+    
+    # Against Docker image (async SDK mode):
+    LOCAL_IMAGE_NAME=my_env_v4:latest API_BASE_URL=<url> API_KEY=<key> python inference.py
 """
 
+import asyncio
 import json
 import os
 import re
@@ -33,6 +38,13 @@ from typing import List, Optional
 
 import requests
 from openai import OpenAI
+
+# Try to import async SDK — if available, support Docker image mode
+try:
+    from my_env_v4 import MyEnvV4Action, MyEnvV4Env
+    HAS_ASYNC_SDK = True
+except ImportError:
+    HAS_ASYNC_SDK = False
 
 # ── Environment variables (evaluator-injected) ─
 # Read EXACTLY as evaluator provides them — no fallbacks
@@ -226,7 +238,95 @@ def run_task(client: OpenAI, task_id: str) -> None:
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
+async def run_task_async(client: OpenAI, env, task_id: str) -> None:
+    """Run task using async SDK environment (Docker image mode)."""
+    rewards: List[float] = []
+    steps_taken = 0
+    score = 0.0
+    success = False
+    last_error: Optional[str] = None
+
+    log_start(task=task_id, env=BENCHMARK, model=MODEL_NAME)
+
+    try:
+        result = await env.reset()
+        obs = result.observation.__dict__ if hasattr(result.observation, '__dict__') else result.observation
+
+        for step in range(1, MAX_STEPS + 1):
+            if result.done:
+                break
+
+            # Get action from LLM
+            action = get_llm_action(client, obs)
+            action_str = f"{action.get('action_type','?')}:{action.get('category','?')}:p{action.get('priority','?')}"
+
+            # Send to environment
+            result = await env.step(MyEnvV4Action(**action) if HAS_ASYNC_SDK else action)
+            obs = result.observation.__dict__ if hasattr(result.observation, '__dict__') else result.observation
+
+            reward = float(result.reward or 0.0)
+            done = bool(result.done or False)
+
+            rewards.append(reward)
+            steps_taken = step
+
+            log_step(step=step, action=action_str, reward=reward, done=done, error=last_error)
+
+            if done:
+                break
+
+        base_score = sum(rewards) / len(rewards) if rewards else 0.0
+        success = base_score >= SUCCESS_THRESHOLD
+        score = 0.9 if success else 0.1
+
+    except Exception as exc:
+        last_error = str(exc)
+        print(f"[DEBUG] Task {task_id} error: {exc}", flush=True)
+
+    finally:
+        log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
+
+
+async def main_async() -> None:
+    """Main entry point for async SDK mode (Docker image)."""
+    if not HAS_ASYNC_SDK or not LOCAL_IMAGE_NAME:
+        print("[ERROR] Async mode requires MyEnvV4Env SDK and LOCAL_IMAGE_NAME", flush=True)
+        sys.exit(1)
+
+    # Initialize OpenAI client
+    client = OpenAI(
+        base_url=os.environ["API_BASE_URL"],
+        api_key=os.environ["API_KEY"],
+    )
+
+    print(f"[INFO] MODE=async (using Docker image: {LOCAL_IMAGE_NAME})", flush=True)
+    print(f"[INFO] MODEL_NAME={MODEL_NAME}", flush=True)
+    print(f"[INFO] Running tasks: {TASKS}", flush=True)
+    print("", flush=True)
+
+    env = await MyEnvV4Env.from_docker_image(LOCAL_IMAGE_NAME)
+    try:
+        start_time = time.time()
+        for task_id in TASKS:
+            await run_task_async(client, env, task_id)
+            print("", flush=True)
+        elapsed = time.time() - start_time
+        print(f"[INFO] Total runtime: {elapsed:.1f}s", flush=True)
+    finally:
+        try:
+            await env.close()
+        except Exception as e:
+            print(f"[DEBUG] env.close() error: {e}", flush=True)
+
+
 def main() -> None:
+    # Check mode: async (Docker) or sync (HTTP REST)
+    if LOCAL_IMAGE_NAME and HAS_ASYNC_SDK:
+        print(f"[INFO] Using async SDK mode (Docker image)", flush=True)
+        asyncio.run(main_async())
+        return
+
+    # ── Sync HTTP REST mode ───────────────────────────────────────────
     # Initialize OpenAI client directly from evaluator-injected environment variables
     # Use os.environ directly (not variables) so evaluator instrumentation detects API usage
     client = OpenAI(
@@ -234,6 +334,7 @@ def main() -> None:
         api_key=os.environ["API_KEY"],
     )
 
+    print(f"[INFO] MODE=sync (HTTP REST: {ENV_URL})", flush=True)
     print(f"[INFO] MODEL_NAME={MODEL_NAME}", flush=True)
     print(f"[INFO] Running tasks: {TASKS}", flush=True)
     print("", flush=True)
