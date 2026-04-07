@@ -1,10 +1,10 @@
 """
 Inference Script — Email Triage Environment
 ============================================
-MANDATORY env variables:
-    API_BASE_URL    The API endpoint for the LLM (default: HF router)
+MANDATORY env variables (injected by the hackathon validator):
+    API_BASE_URL    The LiteLLM proxy endpoint (REQUIRED — injected by validator)
+    API_KEY         The proxy API key          (REQUIRED — injected by validator)
     MODEL_NAME      The model identifier (default: meta-llama/Llama-3.3-70B-Instruct)
-    HF_TOKEN        Your Hugging Face / API key
     ENV_URL         Email Triage environment base URL (default: localhost:8000)
 
 STDOUT FORMAT (strictly enforced):
@@ -12,13 +12,16 @@ STDOUT FORMAT (strictly enforced):
     [STEP]  step=<n> action=<action_str> reward=<0.00> done=<true|false> error=<msg|null>
     [END]   success=<true|false> steps=<n> score=<0.000> rewards=<r1,r2,...>
 
+NOTE: API_BASE_URL and API_KEY MUST come from environment variables.
+      Do NOT hardcode keys or use alternative providers.
+
 Usage:
     # Against local server:
     uvicorn server.app:app --host 0.0.0.0 --port 8000 &
-    HF_TOKEN=hf_xxx python inference.py
+    API_BASE_URL=<proxy_url> API_KEY=<proxy_key> python inference.py
 
-    # Against deployed HF Space:
-    ENV_URL=https://althafali-email-triage-env.hf.space HF_TOKEN=hf_xxx python inference.py
+    # Against deployed HF Space (hackathon):
+    ENV_URL=https://althafali-email-triage-env.hf.space python inference.py
 """
 
 import json
@@ -31,10 +34,12 @@ from typing import List, Optional
 import requests
 from openai import OpenAI
 
-# ── Mandatory env variables (per checklist) ───────────────────────────────────
-API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
-MODEL_NAME   = os.getenv("MODEL_NAME",   "meta-llama/Llama-3.3-70B-Instruct")
-HF_TOKEN     = os.getenv("HF_TOKEN") or os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY")
+# ── Mandatory env variables — injected by the hackathon validator ─────────────
+# These MUST be read from environment variables. Do NOT add fallbacks to
+# personal credentials or hardcode alternative base URLs.
+API_BASE_URL = os.environ.get("API_BASE_URL")   # e.g. https://litellm-proxy.../v1
+API_KEY      = os.environ.get("API_KEY")         # LiteLLM proxy key
+MODEL_NAME   = os.getenv("MODEL_NAME", "meta-llama/Llama-3.3-70B-Instruct")
 ENV_URL      = os.getenv("ENV_URL", "http://localhost:8000").rstrip("/")
 
 BENCHMARK       = "email_triage_env"
@@ -218,15 +223,28 @@ def run_task(client: OpenAI, task_id: str) -> None:
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main() -> None:
-    if not HF_TOKEN:
+    # Validate that the validator-injected env vars are present
+    if not API_BASE_URL:
         print(
-            "[ERROR] HF_TOKEN not set. "
-            "Set it with: $env:HF_TOKEN='hf_xxx'",
+            "[ERROR] API_BASE_URL environment variable is not set. "
+            "This must be injected by the hackathon validator.",
             flush=True,
         )
         sys.exit(1)
 
-    client = OpenAI(api_key=HF_TOKEN, base_url=API_BASE_URL)
+    if not API_KEY:
+        print(
+            "[ERROR] API_KEY environment variable is not set. "
+            "This must be injected by the hackathon validator.",
+            flush=True,
+        )
+        sys.exit(1)
+
+    # Initialize the OpenAI-compatible client pointing at the LiteLLM proxy
+    client = OpenAI(
+        base_url=os.environ["API_BASE_URL"],
+        api_key=os.environ["API_KEY"],
+    )
 
     print(f"[INFO] ENV_URL={ENV_URL}", flush=True)
     print(f"[INFO] API_BASE_URL={API_BASE_URL}", flush=True)
