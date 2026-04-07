@@ -201,19 +201,20 @@ def run_task(client: OpenAI, task_id: str) -> None:
             state_r = requests.get(f"{ENV_URL}/state", timeout=10)
             if state_r.status_code == 200:
                 st = state_r.json()
-                score = float(
+                base_score = float(
                     st.get("current_score")
                     or st.get("score")
-                    or (sum(rewards) / len(rewards) if rewards else 0.5)
+                    or (sum(rewards) / len(rewards) if rewards else 0.0)
                 )
             else:
-                score = sum(rewards) / len(rewards) if rewards else 0.5
+                base_score = sum(rewards) / len(rewards) if rewards else 0.0
         except Exception:
-            score = sum(rewards) / len(rewards) if rewards else 0.5
+            base_score = sum(rewards) / len(rewards) if rewards else 0.0
 
-        # Clamp score to strictly (0.0, 1.0) — must not be exactly 0.0 or 1.0
-        score = max(0.01, min(0.99, score))
-        success = score >= SUCCESS_THRESHOLD
+        # Binary scoring: 0.9 for success, 0.1 for failure
+        # (Strictly between 0 and 1, not 0.0 or 1.0)
+        success = base_score >= SUCCESS_THRESHOLD
+        score = 0.9 if success else 0.1
 
     except Exception as exc:
         last_error = str(exc)
