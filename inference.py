@@ -35,14 +35,12 @@ import requests
 from openai import OpenAI
 
 # ── Environment variables (validator-injected + defaults where allowed) ────────
-# API_BASE_URL: validator MUST inject this — REQUIRED, no default
-API_BASE_URL     = os.getenv("API_BASE_URL")
-# MODEL_NAME: validator may override; reasonable default for local testing
-MODEL_NAME       = os.getenv("MODEL_NAME",   "meta-llama/Llama-3.3-70B-Instruct")
-# HF_TOKEN: Optional — only needed if using HF endpoints
-HF_TOKEN         = os.getenv("HF_TOKEN")
+# API_BASE_URL: validator MUST inject this — REQUIRED, read at runtime in main()
+# HF_TOKEN: Optional — read at runtime in main()
 # LOCAL_IMAGE_NAME: optional — only needed when using from_docker_image()
 LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
+# MODEL_NAME: validator may override; reasonable default for local testing
+MODEL_NAME       = os.getenv("MODEL_NAME",   "meta-llama/Llama-3.3-70B-Instruct")
 # ENV_URL: the running OpenEnv environment server
 ENV_URL          = os.getenv("ENV_URL", "http://localhost:8000").rstrip("/")
 
@@ -227,8 +225,9 @@ def run_task(client: OpenAI, task_id: str) -> None:
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main() -> None:
-    # API_KEY is injected by the hackathon validator at runtime (LiteLLM proxy key)
+    # Read injected environment variables at runtime (not at module import time)
     api_key = os.environ.get("API_KEY")
+    api_base_url = os.environ.get("API_BASE_URL")
 
     if not api_key:
         print(
@@ -265,7 +264,7 @@ def main() -> None:
         )
         sys.exit(1)
 
-    if not API_BASE_URL:
+    if not api_base_url:
         print(
             "[ERROR] API_BASE_URL environment variable is not set.",
             flush=True,
@@ -279,14 +278,15 @@ def main() -> None:
     # Initialize the OpenAI-compatible client pointing at the LiteLLM proxy
     # base_url and api_key MUST come from environment variables (hackathon requirement)
     client = OpenAI(
-        base_url=os.environ["API_BASE_URL"],
-        api_key=os.environ["API_KEY"],
+        base_url=api_base_url,
+        api_key=api_key,
     )
 
+    hf_token = os.environ.get("HF_TOKEN")
     print(f"[INFO] ENV_URL={ENV_URL}", flush=True)
-    print(f"[INFO] API_BASE_URL={API_BASE_URL}", flush=True)
+    print(f"[INFO] API_BASE_URL={api_base_url}", flush=True)
     print(f"[INFO] MODEL_NAME={MODEL_NAME}", flush=True)
-    print(f"[INFO] HF_TOKEN={'set' if HF_TOKEN else 'not set'}", flush=True)
+    print(f"[INFO] HF_TOKEN={'set' if hf_token else 'not set'}", flush=True)
     print(f"[INFO] Running tasks: {TASKS}", flush=True)
     print("", flush=True)
 
