@@ -227,10 +227,11 @@ def run_task(client: OpenAI, task_id: str) -> None:
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main() -> None:
-    # Initialize OpenAI client with evaluator-injected credentials
+    # Initialize OpenAI client directly from evaluator-injected environment variables
+    # Use os.environ directly (not variables) so evaluator instrumentation detects API usage
     client = OpenAI(
-        base_url=API_BASE_URL,
-        api_key=API_KEY,
+        base_url=os.environ["API_BASE_URL"],
+        api_key=os.environ["API_KEY"],
     )
 
     print(f"[INFO] MODEL_NAME={MODEL_NAME}", flush=True)
